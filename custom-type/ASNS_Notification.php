@@ -3,6 +3,44 @@
 class ASNS_Notification
 {
 
+    /**
+     * @var WP_Post
+     */
+    private $post;
+
+    public function __construct($post)
+    {
+        $this->post = $post;
+    }
+
+    public function get_apns_payload()
+    {
+        return array(
+            'aps' => array(
+                'alert' => $this->get_pn_text()
+            )
+        );
+    }
+
+    public function get_gcm_payload()
+    {
+        return array(
+            'message' => $this->get_pn_text()
+        );
+    }
+
+    private function get_pn_text()
+    {
+        $ret = $this->post->post_title;
+        $content = trim($this->post->post_content);
+
+        if ($content) {
+            $ret .= ': ' . $content;
+        }
+
+        return $ret;
+    }
+
     public static function register_post_type()
     {
         register_post_type('asns_pn', array(
