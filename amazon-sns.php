@@ -12,3 +12,4 @@
 
 require_once __DIR__ . '/settings/ASNS_Settings.php';
 require_once __DIR__ . '/custom-type/ASNS_Device.php';
+require_once __DIR__ . '/custom-type/ASNS_Notification.php';
