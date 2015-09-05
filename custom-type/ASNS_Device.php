@@ -72,9 +72,4 @@ class ASNS_Device
 
 }
 
-add_action('init', 'asns_register_device_type');
-
-function asns_register_device_type()
-{
-    ASNS_Device::register_post_type();
-}
+add_action('init', 'ASNS_Device::register_post_type');
