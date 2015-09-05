@@ -43,7 +43,7 @@ class ASNS_Settings
     public static function enqueue_scripts()
     {
         $version = get_plugin_data(__DIR__ . '/../amazon-sns.php')['Version'];
-        wp_enqueue_script('asns-admin', plugins_url('/admin.js', __FILE__), array('jquery'), $version, true);
+        wp_enqueue_script('asns-settings', plugins_url('/settings.js', __FILE__), array('jquery'), $version, true);
     }
 
 }
