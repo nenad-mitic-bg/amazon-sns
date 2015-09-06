@@ -4,17 +4,24 @@
 jQuery(document).ready(function ($) {
 
   wp.asns = {
-    notificationId: 0
+    notificationId: 0,
+    minLoadMilis: 2000
   };
 
   function sendNotification(postId, topicKey) {
+    wp.asns.start = new Date().getTime();
+
     $.post(ajaxurl, {
       action: 'asns_send',
       id: postId,
       topicKey: topicKey
     }).done(function (resp) {
       console.log(resp);
-      wp.asns.dialog.dialog('close');
+      var timeout = wp.asns.minLoadMilis + wp.asns.start - (new Date()).getTime();
+
+      setTimeout(function () {
+        wp.asns.dialog.dialog('close');
+      }, timeout);
     });
   }
 
@@ -41,10 +48,17 @@ jQuery(document).ready(function ($) {
             text: 'Send',
             class: 'button button-primary',
             click: function () {
+              var topicKey = $('#asns-topic-id').val();
+
+              if (!topicKey) {
+                alert('You must select a topic to push the message to');
+                return;
+              }
+
               $('#asns-send-topic').hide();
               $('#asns-send-progress').show();
               $(this).closest('.ui-dialog').find('button').attr('disabled', 1);
-              sendNotification(wp.asns.notificationId, $('#asns-topic-id').val());
+              sendNotification(wp.asns.notificationId, topicKey);
             }
           }
         ],
@@ -53,6 +67,7 @@ jQuery(document).ready(function ($) {
           $('#asns-send-topic').show();
           $('#asns-send-progress').hide();
           $(this).closest('.ui-dialog').find('button').removeAttr('disabled');
+          $('#asns-topic-id').val('');
         },
         create: function () {
           $('#asns-send-progress').progressbar({

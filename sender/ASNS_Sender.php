@@ -22,7 +22,6 @@ class ASNS_Sender
 
     public static function get_modal()
     {
-
         $topics = ASNS_Settings::get_settings()['topic_keys'];
         $topic_options = '';
 
