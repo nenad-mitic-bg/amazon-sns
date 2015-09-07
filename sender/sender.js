@@ -77,6 +77,7 @@ jQuery(document).ready(function ($) {
       });
 
       $('a.asns-send').on('click', function (e) {
+        e.preventDefault();
         wp.asns.dialog.dialog('open');
         wp.asns.notificationId = $(this).data('id');
       });
