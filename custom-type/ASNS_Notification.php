@@ -88,8 +88,13 @@ class ASNS_Notification
                 echo $count ? $count . ' times' : 'Not sent';
                 break;
             case 'asns_last_sent_at':
-                $last_datetime = get_post_meta($post->ID, 'last_sent_at', true);
-                echo $last_datetime ? $last_datetime : 'Never';
+                $timestamp = get_post_meta($post->ID, 'last_sent_at', true);
+
+                if ($timestamp) {
+                    $format = get_option('date_format') . ' ' . get_option('time_format');
+                }
+
+                echo $timestamp ? date_i18n($format, $timestamp) : 'Never';
                 break;
             default:
                 echo "Unexpected column $col_name";
