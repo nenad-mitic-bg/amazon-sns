@@ -12,12 +12,53 @@ class ASNS_Sender
 
     public static function send_notification()
     {
+        require_once __DIR__ . '/../aws.phar';
+        $settings = ASNS_Settings::get_settings();
+        self::validate_settings($settings);
         $topic = self::get_topic(isset($_POST['topicKey']) ? $_POST['topicKey'] : 0);
         $notification = self::get_notification(isset($_POST['id']) ? $_POST['id'] : 0);
+        $message = '';
+        $success = false;
 
-        // send actual data to SNS
-        self::update_notification($notification, $topic[0], 'dummy status');
-        self::send_ajax_response('Message sent');
+        try {
+            self::push_to_sns($notification, $topic[1], $settings['amazon_key'], $settings['amazon_secret'], $settings['amazon_region']);
+            $message = 'Message Sent';
+            $success = true;
+        } catch (Aws\Sns\Exception\SnsException $ex) {
+            $message = $ex->getStatusCode()
+                    . ' / ' . $ex->getAwsErrorCode()
+                    . ' / ' . $ex->getMessage();
+        }
+
+        self::update_notification($notification, $topic[0], $message);
+        self::send_ajax_response($message, $success);
+    }
+
+    /**
+     * @param ASNS_Notification $notification
+     * @param string $topic_arn
+     * @param string $key
+     * @param string $secret
+     * @param string $region
+     * @return Guzzle\Service\Resource\Model
+     */
+    private static function push_to_sns(ASNS_Notification $notification, $topic_arn, $key, $secret, $region)
+    {
+        $args = array(
+            'credentials' => array(
+                'key' => $key,
+                'secret' => $secret
+            ),
+            'region' => $region,
+            'version' => '2010-03-31'
+        );
+        $sdk = new Aws\Sdk($args);
+        $sns_client = $sdk->createSNS();
+
+        return $sns_client->publish(array(
+                    'TopicArn' => $topic_arn,
+                    'Message' => $notification->get_pn_text()
+        ));
     }
 
     private static function update_notification(ASNS_Notification $notifiacation, $app_key, $status)
@@ -99,6 +140,17 @@ class ASNS_Sender
         }
 
         return $topic;
+    }
+
+    public static function validate_settings($settings)
+    {
+        if (!$settings['amazon_key'] || !$settings['amazon_secret']) {
+            return self::send_ajax_response('Amazon credentials not set!', false);
+        }
+
+        if (!$settings['amazon_region']) {
+            return self::send_ajax_response('Amazon region not set!', false);
+        }
     }
 
     private static function send_ajax_response($message, $success = true)

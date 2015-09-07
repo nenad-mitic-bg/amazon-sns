@@ -37,7 +37,7 @@ class ASNS_Notification
         return $this->post->ID;
     }
 
-    private function get_pn_text()
+    public function get_pn_text()
     {
         $ret = $this->post->post_title;
         $content = trim($this->post->post_content);
