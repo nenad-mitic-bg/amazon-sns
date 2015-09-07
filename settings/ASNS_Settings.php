@@ -40,6 +40,24 @@ class ASNS_Settings
         return array_merge($defaults, $options);
     }
 
+    /**
+     * @param string $key
+     * @return array
+     */
+    public static function get_topic($key)
+    {
+        $settings = self::get_settings();
+        $ret = array();
+        $index = array_search($key, $settings['topic_keys']);
+
+        if ($index !== false) {
+            $ret[0] = $key;
+            $ret[1] = $settings['topic_arns'][$index];
+        }
+
+        return $ret;
+    }
+
     public static function enqueue_scripts()
     {
         $version = get_plugin_data(__DIR__ . '/../amazon-sns.php')['Version'];

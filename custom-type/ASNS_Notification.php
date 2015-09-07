@@ -29,6 +29,14 @@ class ASNS_Notification
         );
     }
 
+    /**
+     * @return integer
+     */
+    public function get_id()
+    {
+        return $this->post->ID;
+    }
+
     private function get_pn_text()
     {
         $ret = $this->post->post_title;

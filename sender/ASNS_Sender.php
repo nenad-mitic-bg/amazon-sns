@@ -12,12 +12,33 @@ class ASNS_Sender
 
     public static function send_notification()
     {
-        $settings = ASNS_Settings::get_settings();
+        $topic = self::get_topic(isset($_POST['topicKey']) ? $_POST['topicKey'] : 0);
         $notification = self::get_notification(isset($_POST['id']) ? $_POST['id'] : 0);
 
         // send actual data to SNS
+        self::update_notification($notification, $topic[0], 'dummy status');
+        self::send_ajax_response('Message sent');
+    }
 
-        self::send_ajax_response('');
+    private static function update_notification(ASNS_Notification $notifiacation, $app_key, $status)
+    {
+        $meta = get_post_meta($notifiacation->get_id());
+
+        // Increment count
+        $current_count = isset($meta['sent_count'][0]) ? intval(isset($meta['sent_count'][0])) : 0;
+        update_post_meta($notifiacation->get_id(), 'sent_count', $current_count + 1);
+
+        // Set last sent
+        $timestamp = current_time('timestamp');
+        update_post_meta($notifiacation->get_id(), 'last_sent_at', $timestamp);
+
+        // Add push to history
+        $history = isset($meta['history']) ? unserialize($meta['history'][0]) : array();
+        $format = get_option('date_format') . ' ' . get_option('time_format');
+        $history[] = date_i18n($format, $timestamp)
+                . ' to ' . $app_key
+                . ': ' . $status;
+        update_post_meta($notifiacation->get_id(), 'history', $history);
     }
 
     public static function get_modal()
@@ -63,6 +84,21 @@ class ASNS_Sender
         }
 
         return self::send_ajax_response('Notification post not found', false);
+    }
+
+    /**
+     * @param string $key
+     * @return array
+     */
+    private static function get_topic($key)
+    {
+        $topic = ASNS_Settings::get_topic($key);
+
+        if (!$topic) {
+            return self::send_ajax_response('Topic not found', false);
+        }
+
+        return $topic;
     }
 
     private static function send_ajax_response($message, $success = true)
