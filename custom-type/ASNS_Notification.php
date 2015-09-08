@@ -92,8 +92,16 @@ class ASNS_Notification
 
         switch ($col_name) {
             case 'asns_sent_count':
-                $count = get_post_meta($post->ID, 'sent_count', true);
-                echo $count ? $count . ' times' : 'Not sent';
+                $count = intval(get_post_meta($post->ID, 'sent_count', true));
+
+                if (!$count) {
+                    echo 'Not sent';
+                } else if ($count === 1) {
+                    echo '1 time';
+                } else {
+                    echo $count . ' times';
+                }
+
                 break;
             case 'asns_last_sent_at':
                 $timestamp = get_post_meta($post->ID, 'last_sent_at', true);
