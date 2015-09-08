@@ -1,6 +1,6 @@
 <?php
 
-class ASNS_Sender
+class ASNS_Sender extends ASNS_Ajax
 {
 
     public static function enqueue_scripts()
@@ -151,18 +151,6 @@ class ASNS_Sender
         if (!$settings['amazon_region']) {
             return self::send_ajax_response('Amazon region not set!', false);
         }
-    }
-
-    private static function send_ajax_response($message, $success = true)
-    {
-        $data = array(
-            'status' => $success ? 'ok' : 'error',
-            'message' => $message
-        );
-
-        $_SESSION['asns_notice'] = $data;
-        echo json_encode($data);
-        wp_die();
     }
 
 }
