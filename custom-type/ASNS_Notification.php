@@ -148,6 +148,27 @@ class ASNS_Notification
         unset($_SESSION['asns_notice']);
     }
 
+    public static function register_meta_boxes()
+    {
+        add_meta_box('asns-history', 'Sending Log', 'ASNS_Notification::history_meta_box');
+    }
+
+    /**
+     * @param WP_Post $post
+     */
+    public static function history_meta_box($post)
+    {
+        $history = get_post_meta($post->ID, 'history', true);
+
+        if (!$history) {
+            $history = array('Not sent yet');
+        }
+
+        foreach ($history as $entry) {
+            echo "<p>$entry</p>";
+        }
+    }
+
 }
 
 add_action('init', 'ASNS_Notification::register_post_type');
@@ -155,3 +176,4 @@ add_action('manage_asns_pn_posts_columns', 'ASNS_Notification::columns');
 add_action('manage_asns_pn_posts_custom_column', 'ASNS_Notification::column_val');
 add_action('post_row_actions', 'ASNS_Notification::row_actions');
 add_action('admin_notices', 'ASNS_Notification::admin_notices');
+add_action('add_meta_boxes_asns_pn', 'ASNS_Notification::register_meta_boxes');
