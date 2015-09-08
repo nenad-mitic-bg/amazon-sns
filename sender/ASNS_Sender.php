@@ -155,11 +155,13 @@ class ASNS_Sender
 
     private static function send_ajax_response($message, $success = true)
     {
-        echo json_encode(array(
+        $data = array(
             'status' => $success ? 'ok' : 'error',
             'message' => $message
-        ));
+        );
 
+        $_SESSION['asns_notice'] = $data;
+        echo json_encode($data);
         wp_die();
     }
 

@@ -130,9 +130,28 @@ class ASNS_Notification
         return $actions;
     }
 
+    public static function admin_notices()
+    {
+        if (!isset($_SESSION['asns_notice'])) {
+            return;
+        }
+
+        $class = $_SESSION['asns_notice']['status'] == 'ok' ? 'updated' : 'error';
+        ?>
+
+        <div class="<?php echo $class ?> notice is-dismissible">
+            <p><?php echo $_SESSION['asns_notice']['message'] ?></p>
+            <button type="button" class="notice-dismiss"></button>
+        </div>
+
+        <?php
+        unset($_SESSION['asns_notice']);
+    }
+
 }
 
 add_action('init', 'ASNS_Notification::register_post_type');
 add_action('manage_asns_pn_posts_columns', 'ASNS_Notification::columns');
 add_action('manage_asns_pn_posts_custom_column', 'ASNS_Notification::column_val');
 add_action('post_row_actions', 'ASNS_Notification::row_actions');
+add_action('admin_notices', 'ASNS_Notification::admin_notices');

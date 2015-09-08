@@ -14,3 +14,19 @@ require_once __DIR__ . '/settings/ASNS_Settings.php';
 require_once __DIR__ . '/custom-type/ASNS_Device.php';
 require_once __DIR__ . '/custom-type/ASNS_Notification.php';
 require_once __DIR__ . '/sender/ASNS_Sender.php';
+
+add_action('init', 'asns_session_start');
+add_action('wp_logout', 'asns_session_end');
+add_action('wp_login', 'asns_session_end');
+
+function asns_session_start()
+{
+    if (!session_id()) {
+        session_start();
+    }
+}
+
+function asns_session_end()
+{
+    session_destroy();
+}

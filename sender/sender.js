@@ -16,11 +16,10 @@ jQuery(document).ready(function ($) {
       id: postId,
       topicKey: topicKey
     }).done(function (resp) {
-      console.log(resp);
       var timeout = wp.asns.minLoadMilis + wp.asns.start - (new Date()).getTime();
 
       setTimeout(function () {
-        wp.asns.dialog.dialog('close');
+        location.reload();
       }, timeout);
     });
   }
