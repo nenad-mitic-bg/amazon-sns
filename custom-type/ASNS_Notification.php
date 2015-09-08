@@ -39,14 +39,13 @@ class ASNS_Notification
 
     public function get_pn_text()
     {
-        $ret = $this->post->post_title;
-        $content = trim($this->post->post_content);
+        $content = get_post_meta($this->post->ID, 'asns_pn_content', true);
 
         if ($content) {
-            $ret .= ': ' . $content;
+            return $content;
         }
 
-        return $ret;
+        return $this->post->post_title;
     }
 
     public static function register_post_type()
@@ -59,10 +58,7 @@ class ASNS_Notification
             'show_in_nav_menus' => true,
             'show_ui' => true,
             'menu_icon' => 'dashicons-megaphone',
-            'supports' => array(
-                'title',
-                'editor'
-            ),
+            'supports' => array('title'),
             'rewrite' => false
         ));
     }
@@ -156,9 +152,38 @@ class ASNS_Notification
         unset($_SESSION['asns_notice']);
     }
 
-    public static function register_meta_boxes()
+    public static function register_meta_boxes($post)
     {
+        add_meta_box('asns-content', 'Content', 'ASNS_Notification::content_meta_box');
         add_meta_box('asns-history', 'Sending Log', 'ASNS_Notification::history_meta_box');
+    }
+
+    /**
+     * @param WP_Post $post
+     */
+    public static function content_meta_box($post)
+    {
+        $content = get_post_meta($post->ID, 'asns_pn_content', true);
+        ?>
+
+        <p>If no content is set, the title will be sent to devices.</p>
+
+        <textarea id="asns_pn_content" 
+                  name="asns_pn_content" 
+                  class="large-text" 
+                  rows="6"><?php echo $content; ?></textarea>
+
+        <p class="description">Use only plain text</p>
+
+        <?php
+    }
+
+    public static function save_content($post_id)
+    {
+        if (isset($_POST['asns_pn_content'])) {
+            $content = wp_strip_all_tags(trim($_POST['asns_pn_content']));
+            update_post_meta($post_id, 'asns_pn_content', $content);
+        }
     }
 
     /**
@@ -185,3 +210,4 @@ add_action('manage_asns_pn_posts_custom_column', 'ASNS_Notification::column_val'
 add_action('post_row_actions', 'ASNS_Notification::row_actions');
 add_action('admin_notices', 'ASNS_Notification::admin_notices');
 add_action('add_meta_boxes_asns_pn', 'ASNS_Notification::register_meta_boxes');
+add_action('save_post_asns_pn', 'ASNS_Notification::save_content', 10, 1);
