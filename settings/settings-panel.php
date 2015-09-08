@@ -134,7 +134,7 @@ $settings = ASNS_Settings::get_settings();
         <p>Subscribe a mobile application to receive notifications</p>
         <p>
             <code>
-                wget <?php echo admin_url('admin-ajax.php'); ?> -S -O - --post-data="action=asns_register_device&app=<?php echo $settings['app_keys'][0] ?>&topic=<?php echo $settings['topic_keys'][0] ?>&token=123"
+                wget <?php echo admin_url('admin-ajax.php'); ?> -q -S -O - --post-data="action=asns_register_device&app=<?php echo $settings['app_keys'][0] ?>&topic=<?php echo $settings['topic_keys'][0] ?>&token=123"
             </code>
         </p>
     <?php else : ?>
