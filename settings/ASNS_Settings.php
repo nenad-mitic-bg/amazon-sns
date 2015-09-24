@@ -58,6 +58,24 @@ class ASNS_Settings
         return $ret;
     }
 
+    /**
+     * @param string $key
+     * @return array
+     */
+    public static function get_application($key)
+    {
+        $settings = self::get_settings();
+        $ret = array();
+        $index = array_search($key, $settings['app_keys']);
+
+        if ($index !== false) {
+            $ret[0] = $key;
+            $ret[1] = $settings['app_arns'][$index];
+        }
+
+        return $ret;
+    }
+
     public static function enqueue_scripts()
     {
         $version = get_plugin_data(__DIR__ . '/../amazon-sns.php')['Version'];

@@ -38,12 +38,10 @@ class ASNS_Device
 
     /**
      * @param string $app
-     * @param string $device_id
      * @param string $token
-     * @param string $endpoint_arn
      * @return integer
      */
-    public static function create($app, $device_id, $token, $endpoint_arn)
+    public static function create($app, $token)
     {
         $post_id = wp_insert_post(array(
             'post_title' => uniqid("asns_{$app}_"),
@@ -52,17 +50,11 @@ class ASNS_Device
         ));
 
         if (!is_wp_error($post_id)) {
-            update_post_meta($post_id, 'asns_device_id', $device_id);
             update_post_meta($post_id, 'asns_device_token', $token);
-            update_post_meta($post_id, 'asns_endpoint_arn', $endpoint_arn);
+            update_post_meta($post_id, 'asns_endpoint_arn', '');
         }
 
         return $post_id;
-    }
-
-    public static function set_token($post_id, $token)
-    {
-        update_post_meta($post_id, 'asns_device_token', $token);
     }
 
     public static function set_arn($post_id, $arn)

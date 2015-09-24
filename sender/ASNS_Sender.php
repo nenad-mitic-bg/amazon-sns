@@ -61,7 +61,7 @@ class ASNS_Sender extends ASNS_Ajax
         ));
     }
 
-    private static function update_notification(ASNS_Notification $notifiacation, $app_key, $status)
+    private static function update_notification(ASNS_Notification $notifiacation, $topic_name, $status)
     {
         $meta = get_post_meta($notifiacation->get_id());
 
@@ -77,7 +77,7 @@ class ASNS_Sender extends ASNS_Ajax
         $history = isset($meta['history']) ? unserialize($meta['history'][0]) : array();
         $format = get_option('date_format') . ' ' . get_option('time_format');
         $history[] = date_i18n($format, $timestamp)
-                . ' to ' . $app_key
+                . ' to ' . $topic_name
                 . ': ' . $status;
         update_post_meta($notifiacation->get_id(), 'history', $history);
     }
@@ -125,32 +125,6 @@ class ASNS_Sender extends ASNS_Ajax
         }
 
         return self::send_ajax_response('Notification post not found', false);
-    }
-
-    /**
-     * @param string $key
-     * @return array
-     */
-    private static function get_topic($key)
-    {
-        $topic = ASNS_Settings::get_topic($key);
-
-        if (!$topic) {
-            return self::send_ajax_response('Topic not found', false);
-        }
-
-        return $topic;
-    }
-
-    public static function validate_settings($settings)
-    {
-        if (!$settings['amazon_key'] || !$settings['amazon_secret']) {
-            return self::send_ajax_response('Amazon credentials not set!', false);
-        }
-
-        if (!$settings['amazon_region']) {
-            return self::send_ajax_response('Amazon region not set!', false);
-        }
     }
 
 }
